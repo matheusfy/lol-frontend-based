@@ -1,3 +1,124 @@
+const routes = {
+  champions: "http://localhost:8080/champions",
+  ask: "http://localhost:8080/champions/{championId}/ask"
+}
+
+
+const apiService = {
+
+  async getChampions() {
+    const route = routes.champions;
+    const response = await fetch(route);
+    return response.json();
+  },
+
+  async postAskChampions(id, message){
+
+    const route = routes.ask.replace("{championId}", id);
+    data = {question : message}
+
+    console.log(`${id} e message: ${message}, rota: ${route}`);
+
+
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }
+
+    const response = await fetch(route, options);
+
+    return response.json();
+    
+  },
+}
+
+const state = {
+  values: {
+    champions: [],
+    selectedId: 0,
+  },
+  views: {
+    response: document.querySelector(".text-reponse"),
+    question: document.getElementById("text-request"),
+    avatar  : document.getElementById("avatar"),
+    carousel: document.getElementById("carousel-cards-content"),
+  }
+}
+
+
+
+async function main() {
+
+  await loadChampions();
+  await renderChampions();
+
+  await loadCarrousel()
+};
+
+async function loadChampions(){
+  const championsData = await apiService.getChampions();
+  state.values.champions = championsData;
+}
+
+async function renderChampions(){
+  const championsData = state.values.champions;
+  const elements = championsData.map((champion) =>
+      `      
+      <div class="timeline-carousel__item" onclick="onChangeChampionSelected(${champion.id}, '${champion.image_url}')">
+        <div class="timeline-carousel__image">
+          <div class="media-wrapper media-wrapper--overlay"
+            style="background: url('${champion.image_url}') center center; background-size:cover;">
+          </div>
+        </div>
+        <div class="timeline-carousel__item-inner">
+          <span class="name">${champion.name}</span>
+          <span class="role">${champion.role}</span>
+          <p>${champion.lore}/p>
+        </div>
+      </div>`
+  );
+
+  state.views.carousel.innerHTML = elements.join(" ");
+
+  if (championsData != []){
+    state.views.avatar.style.backgroundImage = `url('${championsData[0].image_url}')`;
+    state.views.response.textContent = `Faça uma pergunta para ${championsData[0].name}`;
+  }
+}
+
+async function onChangeChampionSelected(championId, image_url){
+  state.views.avatar.style.backgroundImage = `url('${image_url}')`;
+  state.views.avatar.dataset.id = championId;
+  state.values.selectedId = championId;
+  await resetForm();
+}
+
+async function resetForm(){
+  state.views.question.value = "";
+  state.views.response.textContent = `Faça uma pergunta para ${state.values.champions[state.values.selectedId - 1].name}`;
+}
+
+async function fetchAskChampion(){
+
+  if (state.views.question.value != "") {
+    const championId = state.values.selectedId;
+    const message = state.views.question.value;
+  
+    console.log(`Pergunta: ${message}`);
+  
+    const data = await apiService.postAskChampions(championId, message);
+    
+    state.views.response.textContent = await data.answer;
+
+  } else {
+    state.views.response.textContent = "Campo de pergunta está vazio!"
+  }
+
+}
+
 async function loadCarrousel() {
   const caroujs = (el) => {
     return $("[data-js=" + el + "]");
@@ -28,4 +149,4 @@ async function loadCarrousel() {
   });
 }
 
-loadCarrousel();
+main();
