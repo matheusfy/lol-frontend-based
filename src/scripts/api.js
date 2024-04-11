@@ -1,6 +1,6 @@
 const routes = {
-  champions: "http://localhost:8080/champions",
-  ask: "http://localhost:8080/champions/{championId}/ask"
+  champions: "http://sdw2024-yoko.sa-east-1.elasticbeanstalk.com/champions",
+  ask: "http://sdw2024-yoko.sa-east-1.elasticbeanstalk.com/champions/{championId}/ask"
 }
 
 
