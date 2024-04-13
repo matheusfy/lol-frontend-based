@@ -1,4 +1,9 @@
+const FIRST = 1;
+
 const routes = {
+  // champions: "http://localhost:8080/champions",
+  // ask: "http://localhost:8080/champions/{championId}/ask"
+
   champions: "http://sdw2024-yoko.sa-east-1.elasticbeanstalk.com/champions",
   ask: "http://sdw2024-yoko.sa-east-1.elasticbeanstalk.com/champions/{championId}/ask"
 }
@@ -17,8 +22,7 @@ const apiService = {
     const route = routes.ask.replace("{championId}", id);
     data = {question : message}
 
-    console.log(`${id} e message: ${message}, rota: ${route}`);
-
+    // console.log(`Fazendo pergunta para ${state.values.champions[id - 1].name}. mensagem: ${message}`);
 
     const options = {
       method: 'POST',
@@ -86,6 +90,7 @@ async function renderChampions(){
   if (championsData != []){
     state.views.avatar.style.backgroundImage = `url('${championsData[0].image_url}')`;
     state.views.response.textContent = `Faça uma pergunta para ${championsData[0].name}`;
+    state.values.selectedId = FIRST;
   }
 }
 
@@ -106,8 +111,6 @@ async function fetchAskChampion(){
   if (state.views.question.value != "") {
     const championId = state.values.selectedId;
     const message = state.views.question.value;
-  
-    console.log(`Pergunta: ${message}`);
   
     const data = await apiService.postAskChampions(championId, message);
     
