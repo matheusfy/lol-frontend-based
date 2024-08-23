@@ -1,41 +1,43 @@
 const FIRST = 1;
 
 const routes = {
-  // champions: "http://localhost:8080/champions",
-  // ask: "http://localhost:8080/champions/{championId}/ask"
+  // champions: "http://localhost:80/champions",
+  // ask: "http://localhost:80/champions/{championId}/ask"
 
-  champions: "http://sdw2024-yoko.sa-east-1.elasticbeanstalk.com/champions",
-  ask: "http://sdw2024-yoko.sa-east-1.elasticbeanstalk.com/champions/{championId}/ask"
+  champions: "http://ec2-3-235-45-206.compute-1.amazonaws.com/champions",
+  ask: "http://ec2-3-235-45-206.compute-1.amazonaws.com/champions/{championId}/ask"
 }
-
 
 const apiService = {
 
   async getChampions() {
     const route = routes.champions;
     const response = await fetch(route);
+
     return response.json();
   },
 
-  async postAskChampions(id, message){
+  async postAskChampions(id, message) {
 
     const route = routes.ask.replace("{championId}", id);
-    data = {question : message}
+    data = { question: message }
 
     // console.log(`Fazendo pergunta para ${state.values.champions[id - 1].name}. mensagem: ${message}`);
 
     const options = {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'mode': 'no-cors',
       },
+
       body: JSON.stringify(data)
     }
 
     const response = await fetch(route, options);
 
     return response.json();
-    
+
   },
 }
 
@@ -47,7 +49,7 @@ const state = {
   views: {
     response: document.querySelector(".text-reponse"),
     question: document.getElementById("text-request"),
-    avatar  : document.getElementById("avatar"),
+    avatar: document.getElementById("avatar"),
     carousel: document.getElementById("carousel-cards-content"),
   }
 }
@@ -62,15 +64,15 @@ async function main() {
   await loadCarrousel()
 };
 
-async function loadChampions(){
+async function loadChampions() {
   const championsData = await apiService.getChampions();
   state.values.champions = championsData;
 }
 
-async function renderChampions(){
+async function renderChampions() {
   const championsData = state.values.champions;
   const elements = championsData.map((champion) =>
-      `      
+    `      
       <div class="timeline-carousel__item" onclick="onChangeChampionSelected(${champion.id}, '${champion.image_url}')">
         <div class="timeline-carousel__image">
           <div class="media-wrapper media-wrapper--overlay"
@@ -87,33 +89,33 @@ async function renderChampions(){
 
   state.views.carousel.innerHTML = elements.join(" ");
 
-  if (championsData != []){
+  if (championsData != []) {
     state.views.avatar.style.backgroundImage = `url('${championsData[0].image_url}')`;
     state.views.response.textContent = `Faça uma pergunta para ${championsData[0].name}`;
     state.values.selectedId = FIRST;
   }
 }
 
-async function onChangeChampionSelected(championId, image_url){
+async function onChangeChampionSelected(championId, image_url) {
   state.views.avatar.style.backgroundImage = `url('${image_url}')`;
   state.views.avatar.dataset.id = championId;
   state.values.selectedId = championId;
   await resetForm();
 }
 
-async function resetForm(){
+async function resetForm() {
   state.views.question.value = "";
   state.views.response.textContent = `Faça uma pergunta para ${state.values.champions[state.values.selectedId - 1].name}`;
 }
 
-async function fetchAskChampion(){
+async function fetchAskChampion() {
 
   if (state.views.question.value != "") {
     const championId = state.values.selectedId;
     const message = state.views.question.value;
-  
+
     const data = await apiService.postAskChampions(championId, message);
-    
+
     state.views.response.textContent = await data.answer;
 
   } else {
