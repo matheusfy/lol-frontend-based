@@ -4,8 +4,8 @@ const routes = {
   // champions: "http://localhost:80/champions",
   // ask: "http://localhost:80/champions/{championId}/ask"
 
-  champions: "http://ec2-3-235-45-206.compute-1.amazonaws.com/champions",
-  ask: "http://ec2-3-235-45-206.compute-1.amazonaws.com/champions/{championId}/ask"
+  champions: "http://ec2-54-87-161-229.compute-1.amazonaws.com:8080/api/champions",
+  ask: "http://ec2-54-87-161-229.compute-1.amazonaws.com:8080/api/champions/{championId}/ask"
 }
 
 const apiService = {

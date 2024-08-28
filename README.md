@@ -28,3 +28,4 @@ Abaixo está a estruturação dos arquivos da parte do frontend.
 - `src`: pasta destinada para armazenar codigo de desenvolvimento do projeto .js, .css e .html
   - `scripts`: pasta destinada para arquivos escritos em JavaScript.
 - `index.hmtl`: Arquivo que é carregado quando iniciamos a aplicação. 
+
